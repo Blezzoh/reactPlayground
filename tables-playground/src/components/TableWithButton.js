@@ -59,6 +59,8 @@ const columns = [{
       <ReactTable 
             columns={getColumns()}
             data={data}
+            pageSize={data.length}
+            showPagination={false}
           />
     )
   }

@@ -42,7 +42,7 @@ export default class fitlerCreator {
     }
     /**
      * return filtered data
-     * @param {Array} data - array of Json's
+     * @param {Array} data - array of Jsons to be filtered
      */
     appylFilter(data){
         const whichOperator = this.combinator === 'and' ? 2 : 1
@@ -56,7 +56,6 @@ export default class fitlerCreator {
         if(filterId === 1){
             for (const filter of this.rules) {
                 // here you need a function that tells you which sign to use\
-                // !!! THANKS DRUNK BLASE FOR WRITTING THIS FUNCTION 
                 if(obj[filter.field] === filter.value) return true // not done you need to check all the five filters but this is the right logic
             }
             return false

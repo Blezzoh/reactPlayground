@@ -1,4 +1,3 @@
-import { timingSafeEqual } from "crypto";
 
 /**
  * this class is modeled after react query builder
@@ -55,16 +54,32 @@ export default class fitlerCreator {
     applySingleFilter(obj, filterId){
         if(filterId === 1){
             for (const filter of this.rules) {
-                // here you need a function that tells you which sign to use\
-                if(obj[filter.field] === filter.value) return true // not done you need to check all the five filters but this is the right logic
+                return this.applyFilterSign(obj[filter.field] , filter.value, this.operators(filter.operator))
             }
             return false
         }
         else{
-            for (const filter of this.rules) { // not done you need to check all the five filters but this is the right logic
-                if(obj[field.field] !== filter.value) return false
+            for (const filter of this.rules) { 
+                if(!this.applyFilterSign(obj[filter.field] , filter.value, this.operators(filter.operator))) return false
             }
             return true
+        }
+    }
+    applyFilterSign(value1, value2, operatorId){
+        if(operatorId === 1){
+            return value1 === value2
+        }
+        if(operatorId === 2){
+            return value1 > value2
+        }
+        if(operatorId === 3){
+            return value1 < value2
+        }
+        if(operatorId === 4){
+            return value1 <= value2
+        }
+        if(operatorId === 5){
+            return value1 >= value2
         }
     }
 

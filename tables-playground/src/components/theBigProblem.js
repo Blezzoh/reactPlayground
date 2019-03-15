@@ -8,7 +8,10 @@ let sizing={
     initialFlex:0,
     flexNumber:0,
     currentlySizing: -1
-}initial problem solved, the remaining is to redo the calculations
+}
+//initial problem solved, the remaining is to redo the calculations => done
+//the sizing of the first column works
+//next problem: make sure the entire first column is resizable
 export default class TheResizeProblem extends Component{
     constructor(props){
         super(props)

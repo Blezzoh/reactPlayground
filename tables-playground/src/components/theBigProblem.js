@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import {Table} from 'react-bootstrap'
 import './artable.css'
 let sizing={
     colSizes:[],
@@ -7,9 +6,9 @@ let sizing={
     currentlySizing: false,
     startX: 0,
     initialFlex:0,
-    flexNumber:1
-}
-// initial problem solved, the remaining is to redo the calculations
+    flexNumber:0,
+    currentlySizing: -1
+}initial problem solved, the remaining is to redo the calculations
 export default class TheResizeProblem extends Component{
     constructor(props){
         super(props)
@@ -34,12 +33,22 @@ export default class TheResizeProblem extends Component{
         document.addEventListener('mouseleave', this.handleResizeStop)
         sizing ={...sizing, startX:pageX, parentWidth: parentWidth, resizing:true}
     }
+    handleResizeStart=(e, i)=>{
+        e.stopPropagation()
+        const parentWidth = e.target.parentElement.getBoundingClientRect().width
+        let pageX = e.pageX
+        console.log('width', parentWidth, pageX, 'currently sizing', i)
+        document.addEventListener('mousemove', this.handleResizeMovement)
+        document.addEventListener('mouseup', this.handleResizeStop)
+        document.addEventListener('mouseleave', this.handleResizeStop)
+        sizing ={...sizing, startX:pageX, parentWidth: parentWidth, resizing:true, currentlySizing: i}
+    }
     handleResizeMovement=(e)=>{
         console.log('being called')
         e.stopPropagation()
         const {startX, parentWidth} = sizing
         let pageX = e.pageX
-        const newWidth = parentWidth?(parentWidth + pageX - startX)/parentWidth :1
+        const newWidth = (parentWidth + pageX - startX)
         console.log('width new',pageX, startX, parentWidth, newWidth, sizing)
         sizing = {...sizing, flexNumber: newWidth, initialFlex: parentWidth}
         this.forceUpdate()
@@ -53,8 +62,9 @@ export default class TheResizeProblem extends Component{
         sizing ={
             ...sizing,
             resizing:false,
-            parentWidth: 0,
-            startX:0,
+            currentlySizing: -1,
+            // parentWidth: 0,
+            // startX:0,
         }
         console.log('width mouse up')
     }
@@ -65,10 +75,10 @@ export default class TheResizeProblem extends Component{
                 <div className='ar-table' style={{minWidth: this.state.minWidth}}>
                     <div className='ar-thead' style={{minWidth: this.state.minWidth}}>
                             <div className='ar-tr'>
-                                <div className='ar-resizable-header pointed ar-th' style={flexNumber?{flex: `${flexNumber} 0`}: {flex:`1 0`}}>
+                                <div className='ar-resizable-header pointed ar-th' style={flexNumber?{flex: `${flexNumber}px 0`}: {flex:`1 0`}}>
                                     <div className='ar-th-data'>fafa</div>
                                     <div className='ar-resizer' 
-                                        onMouseDown={e=>this.handleResizeStart(e)}
+                                        onMouseDown={e=>this.handleResizeStart(e, 1)}
                                         ></div>
                                 </div>
                                 <div className='ar-resizable-header pointed ar-th ar-th-1'>

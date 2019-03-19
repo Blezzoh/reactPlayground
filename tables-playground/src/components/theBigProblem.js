@@ -3,20 +3,19 @@ import './artable.css'
 let sizing={
     colSizes:[],
     minSize: 0.1,
-    currentlySizing: false,
+    currentlySizing: -1,
     startX: 0,
-    initialFlex:0,
     flexNumber:0,
-    currentlySizing: -1
+    initialFlex: 0
 }
-//initial problem solved, the remaining is to redo the calculations => done
-//the sizing of the first column works
-//next problem: make sure the entire first column is resizable
+// calculatios done, next step: create a data structure for this
 export default class TheResizeProblem extends Component{
     constructor(props){
         super(props)
         this.state ={
             minWidth: '1000px',
+            data:['brdk', 'mane', 'zizou', 'goats'],
+            other:['legend', 'African beast', 'power shot', 'didier'],
             sizing:{
                 colSizes:[],
                 minSize: 0.1,
@@ -26,16 +25,19 @@ export default class TheResizeProblem extends Component{
             }
         }
     }
-    handleResizeStart=(e)=>{
-        e.stopPropagation()
-        const parentWidth = e.target.parentElement.getBoundingClientRect().width
-        let pageX = e.pageX
-        console.log('width', parentWidth, pageX)
-        document.addEventListener('mousemove', this.handleResizeMovement)
-        document.addEventListener('mouseup', this.handleResizeStop)
-        document.addEventListener('mouseleave', this.handleResizeStop)
-        sizing ={...sizing, startX:pageX, parentWidth: parentWidth, resizing:true}
+    componentWillMount(){
+        const {data} =this.state
+        if(data && data.length){
+            const sizes = data.reduce(
+                (accumulator)=>{
+                    return [...accumulator, 0]
+                }, []
+            )
+            sizing = {...sizing, colSizes:sizes}
+        }
+        console.log(sizing)
     }
+
     handleResizeStart=(e, i)=>{
         e.stopPropagation()
         const parentWidth = e.target.parentElement.getBoundingClientRect().width
@@ -50,11 +52,13 @@ export default class TheResizeProblem extends Component{
         console.log('being called')
         e.stopPropagation()
         const {startX, parentWidth} = sizing
+        let sizes = sizing.colSizes
         let pageX = e.pageX
         const newWidth = (parentWidth + pageX - startX)
+        sizes[sizing.currentlySizing] = newWidth
         console.log('width new',pageX, startX, parentWidth, newWidth, sizing)
-        sizing = {...sizing, flexNumber: newWidth, initialFlex: parentWidth}
-        this.forceUpdate()
+        sizing = {...sizing, flexNumber: newWidth, colSizes: sizes}
+        this.forceUpdate()// as sizing is neither a prop or a state value, it is not going to trigger the rendering ... thus forcing the update
     }
     handleResizeStop=(e)=>{
         console.log('being called stop')
@@ -72,26 +76,209 @@ export default class TheResizeProblem extends Component{
         console.log('width mouse up')
     }
     render(){
-        const {flexNumber, initialFlex} = sizing
+        const {colSizes} = sizing
+        const {data, other} = this.state
+        console.log('sizes', colSizes)
         return (
             <div className='art-table'>
-                <div className='ar-table' style={{minWidth: this.state.minWidth}}>
-                    <div className='ar-thead' style={{minWidth: this.state.minWidth}}>
+                <div className='ar-table' >
+                <div className='ar-thead'>
                             <div className='ar-tr'>
-                                <div className='ar-resizable-header pointed ar-th' style={flexNumber?{flex: `${flexNumber}px 0`}: {flex:`1 0`}}>
-                                    <div className='ar-th-data'>fafa</div>
-                                    <div className='ar-resizer' 
-                                        onMouseDown={e=>this.handleResizeStart(e, 1)}
-                                        ></div>
-                                </div>
-                                <div className='ar-resizable-header pointed ar-th ar-th-1'>
-                                    <div className='ar-th-data'>fafa</div>
-                                    <div className='ar-resizer'></div>
+                                {
+                                    data.map(
+                                        (d, i)=> (
+                                            <div className='ar-resizable-header pointed ar-th' style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}} key={i}>
+                                                <div className='ar-th-data'>{d}</div>
+                                                <div className='ar-resizer' 
+                                                    onMouseDown={e=>this.handleResizeStart(e, i)}
+                                                />
+                                            </div>
+                                        )
+                                    )
+                                }
+                            </div>
+                            <div className='ar-thead'>
+                                <div className='ar-tr ar-th-independent'>
+                                    Open
                                 </div>
                             </div>
                     </div>
                     <div className='ar-tbody' style={{minWidth: this.state.minWidth}}>
-                        asdsadas
+                        <div className='ar-tbody-group'>
+                                <div className='ar-tr'>
+                                    {
+                                        other.map(
+                                            (d,i)=>(
+                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
+                                                    {d}
+                                                </div>
+                                            )
+                                        )
+                                    }
+                                </div>
+                        </div>
+                        <div className='ar-tbody-group'>
+                                <div className='ar-tr'>
+                                    {
+                                        other.map(
+                                            (d,i)=>(
+                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
+                                                    {d}
+                                                </div>
+                                            )
+                                        )
+                                    }
+                                </div>
+                        </div>
+                        <div className='ar-tbody-group'>
+                                <div className='ar-tr'>
+                                    {
+                                        other.map(
+                                            (d,i)=>(
+                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
+                                                    {d}
+                                                </div>
+                                            )
+                                        )
+                                    }
+                                </div>
+                        </div>
+                        <div className='ar-tbody-group'>
+                                <div className='ar-tr'>
+                                    {
+                                        other.map(
+                                            (d,i)=>(
+                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
+                                                    {d}
+                                                </div>
+                                            )
+                                        )
+                                    }
+                                </div>
+                        </div>
+                    </div>
+                    <div className='ar-thead'>
+                            
+                            <div className='ar-thead'>
+                                <div className='ar-tr ar-th-independent'>
+                                   Legal
+                                </div>
+                            </div>
+                    </div>
+                    <div className='ar-tbody' style={{minWidth: this.state.minWidth}}>
+                        <div className='ar-tbody-group'>
+                                <div className='ar-tr'>
+                                    {
+                                        other.map(
+                                            (d,i)=>(
+                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
+                                                    {d}
+                                                </div>
+                                            )
+                                        )
+                                    }
+                                </div>
+                        </div>
+                        <div className='ar-tbody-group'>
+                                <div className='ar-tr'>
+                                    {
+                                        other.map(
+                                            (d,i)=>(
+                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
+                                                    {d}
+                                                </div>
+                                            )
+                                        )
+                                    }
+                                </div>
+                        </div>
+                        <div className='ar-tbody-group'>
+                                <div className='ar-tr'>
+                                    {
+                                        other.map(
+                                            (d,i)=>(
+                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
+                                                    {d}
+                                                </div>
+                                            )
+                                        )
+                                    }
+                                </div>
+                        </div>
+                        <div className='ar-tbody-group'>
+                                <div className='ar-tr'>
+                                    {
+                                        other.map(
+                                            (d,i)=>(
+                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
+                                                    {d}
+                                                </div>
+                                            )
+                                        )
+                                    }
+                                </div>
+                        </div>
+                    </div>
+                    <div className='ar-thead'>
+                            <div className='ar-thead'>
+                                <div className='ar-tr ar-th-independent'>
+                                    Closed
+                                </div>
+                            </div>
+                    </div>
+                    <div className='ar-tbody' style={{minWidth: this.state.minWidth}}>
+                        <div className='ar-tbody-group'>
+                                <div className='ar-tr'>
+                                    {
+                                        other.map(
+                                            (d,i)=>(
+                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
+                                                    {d}
+                                                </div>
+                                            )
+                                        )
+                                    }
+                                </div>
+                        </div>
+                        <div className='ar-tbody-group'>
+                                <div className='ar-tr'>
+                                    {
+                                        other.map(
+                                            (d,i)=>(
+                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
+                                                    {d}
+                                                </div>
+                                            )
+                                        )
+                                    }
+                                </div>
+                        </div>
+                        <div className='ar-tbody-group'>
+                                <div className='ar-tr'>
+                                    {
+                                        other.map(
+                                            (d,i)=>(
+                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
+                                                    {d}
+                                                </div>
+                                            )
+                                        )
+                                    }
+                                </div>
+                        </div>
+                        <div className='ar-tbody-group'>
+                                <div className='ar-tr'>
+                                    {
+                                        other.map(
+                                            (d,i)=>(
+                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
+                                                    {d}
+                                                </div>
+                                            )
+                                        )
+                                    }
+                                </div>
+                        </div>
                     </div>
                 </div>
             </div>

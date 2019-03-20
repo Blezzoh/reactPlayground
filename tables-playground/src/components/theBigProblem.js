@@ -40,8 +40,8 @@ export default class TheResizeProblem extends Component{
         super(props)
         this.state ={
             minWidth: '1000px',
-            data:['brdk', 'mane', 'zizou', 'goats'],
-            other:['legend', 'African beast', 'power shot', 'didier'],
+            data:['brdk', 'mane', 'zizou'],
+            other:['legend', 'African beast', 'power shot'],
             sizing:{
                 colSizes:[],
                 minSize: 0.1,
@@ -129,9 +129,9 @@ export default class TheResizeProblem extends Component{
         </div>
         )
     }
-    displayGroupingHeader(str){
+    displayGroupingHeader(str, number){
         return (
-            <div className='ar-tr'>
+            <div className='ar-tr' key={`${str}-${number}`}>
                 <div className='ar-tr ar-th-independent ar-th-group'>
                     {str}
                 </div>
@@ -139,11 +139,10 @@ export default class TheResizeProblem extends Component{
         ) 
     }
     displaySingleDataRow(row, headers,sizes){
-        console.log('single row', row, headers, sizes)
         return headers.map(
             (d,i)=>{
                 return (
-                    <div className='ar-td' key={i} style={sizes[i]?{flex: `${sizes[i]} 0`}: {flex:`1 0`}}>
+                    <div className='ar-td' key={i} style={sizes[i]?{flex: `${sizes[i]}px 0`}: {flex:`1 0`}}>
                         {row[d.field]}
                     </div>
                 )
@@ -162,10 +161,9 @@ export default class TheResizeProblem extends Component{
         let start = 0
         if(groupLength.length){
             for(let j=0; j < groupLength.length; j++){
-                console.log('here 1')
                 let groupRow = this.displayGroupRowData(data, headers, groupLength[j], start, sizes)
                 if(subHeaders[j]){
-                    groupRow = [this.displayGroupingHeader(subHeaders[j]), ...groupRow]
+                    groupRow = [this.displayGroupingHeader(subHeaders[j], j), ...groupRow]
                 }
                 body=[...body, ...groupRow]
                 start += groupLength[j]
@@ -174,7 +172,7 @@ export default class TheResizeProblem extends Component{
         else{
             let groupRow = this.displayGroupRowData(data, headers, data.length, 0, sizes)
             if(subHeaders.length){
-                body=[this.displayGroupingHeader(subHeaders[0]), ...groupRow]
+                body=[this.displayGroupingHeader(subHeaders[0], 0), ...groupRow]
             }
             else{
                 body = groupRow
@@ -184,13 +182,11 @@ export default class TheResizeProblem extends Component{
     }
     render(){
         const {colSizes} = sizing
-        const {data, other} = this.state
         console.log('sizes', colSizes)
         const sizes =[0,0,0]
-        //data, headers,subHeaders, groupLength,sizes
-        console.log('body',this.displayTableBody(dataObject.data, columnsObject.headers, dataObject.independentSubheaders, dataObject.groupLength, sizes))
-        const BodyJsx = this.displayTableBody(dataObject.data, columnsObject.headers, dataObject.independentSubheaders, dataObject.groupLength, sizes)
-        const mainHeader = this.displayMainHeder(columnsObject.headers, sizes)
+        //body, main header and subheader
+        const BodyJsx = this.displayTableBody(dataObject.data, columnsObject.headers, dataObject.independentSubheaders, dataObject.groupLength, colSizes)
+        const mainHeader = this.displayMainHeder(columnsObject.headers, colSizes)
         const independentHeaders = this.displayIndependentHeader(columnsObject.independentHeaders[0])
         return (
             <div className='art-table'>

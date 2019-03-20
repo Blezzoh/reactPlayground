@@ -8,7 +8,33 @@ let sizing={
     flexNumber:0,
     initialFlex: 0
 }
-// calculatios done, next step: create a data structure for this
+const columnsObject = {
+    independentHeaders: ['Legends', 'Money Makers', 'Dedicated People'],
+    headers: [{header:'Players', field:'player'}, {header: 'Coachs', field:'coach'}, {header:'ladies', field:'lady'}]
+}
+const dataObject ={
+    independentSubheaders: ['sub header 1', 'sub header 2'],
+    data: [{player: 'Drogba', coach: 'Ferguson', lady:'Mother Theresa'},
+     {player: 'Gianfranco Zola', coach: 'Ferguson', lady:'Aung Sang Suu Kyi'},
+     {player: 'John Terry', coach: 'Guardiola', lady:'Mothers'},
+     {player: 'Ricardo Carvalho', coach: 'Morinho', lady:'Serena Williams'},
+     {player: 'Claude Makelele', coach: 'Di Mateo', lady:'Mothers'},
+     {player: 'Lampard', coach: 'Lampard', lady:'Michelle Obame'},
+     {player: 'Arjen Robben', coach: 'Boby Robson', lady:'Queen of Englans'},
+     {player: 'Diego Costa', coach: 'Franz Beckenbauer', lady:'Oprah Winfrey'},
+     {player: 'Dan Petrescu', coach: 'Sir Matt Busby', lady:'Madonna'},
+     {player: 'Eidur Gudjohnsen', coach: 'Fabio Capello', lady:'Indira Gandhi'},
+     {player: 'Eden Hazard', coach: 'Brian Clough', lady:' Audrey Hepburn '},
+     {player: 'Ashley Cole', coach: 'Johan Cruyff', lady:'Duchess of Cambridge'},
+     {player: 'NGolo Kanté', coach: 'Ernst Happel', lady:'Mute R Kelly'},
+     {player: 'Ruud Gullit', coach: 'Helenio Herrera', lady:'Queen of Saba'},
+     {player: 'Branislav Ivanović', coach: 'Guus Hiddink', lady:'Beyonce'},
+     {player: 'César Azpilicueta', coach: 'Ottmar Hitzfeld', lady:'Rihanna'},
+     {player: 'Marcel Desailly', coach: 'Marcello Lippi', lady:'Monroe'}
+    ],
+    groupLength:[7, 10]
+}
+// data structure check, display function 80% done. next: displaying the entire structure and resizing using sizing, and thinking about using data as props
 export default class TheResizeProblem extends Component{
     constructor(props){
         super(props)
@@ -25,6 +51,7 @@ export default class TheResizeProblem extends Component{
             }
         }
     }
+    
     componentWillMount(){
         const {data} =this.state
         if(data && data.length){
@@ -75,14 +102,100 @@ export default class TheResizeProblem extends Component{
         }
         console.log('width mouse up')
     }
+    displayMainHeder(headers, sizes){
+        return (
+            <div className='ar-tr'>
+                {
+                    headers.map(
+                        (d, i) =>(
+                            <div className='ar-resizable-header pointed ar-th' style={sizes[i]?{flex: `${sizes[i]}px 0`}: {flex:`1 0`}} key={i}>
+                                <div className='ar-th-data'>{d.header}</div>
+                                    <div className='ar-resizer' 
+                                        onMouseDown={e=>this.handleResizeStart(e, i)}
+                                    />
+                                </div>
+                        )
+                    )
+                }
+            </div>
+        )
+    }
+    displayIndependentHeader(str){
+        return (
+            <div className='ar-tr'>
+                <div className='ar-tr ar-th-independent'>
+                                    {str}
+                </div>
+        </div>
+        )
+    }
+    displayGroupingHeader(str){
+        return (
+            <div className='ar-tr'>
+                <div className='ar-tr ar-th-independent ar-th-group'>
+                    {str}
+                </div>
+        </div>
+        ) 
+    }
+    displaySingleDataRow(row, headers,sizes){
+        console.log('single row', row, headers, sizes)
+        return headers.map(
+            (d,i)=>{
+                return (
+                    <div className='ar-td' key={i} style={sizes[i]?{flex: `${sizes[i]} 0`}: {flex:`1 0`}}>
+                        {row[d.field]}
+                    </div>
+                )
+            }
+        )
+    }
+    displayGroupRowData(data, headers,length, start, sizes){
+        const end = start + length
+        const newData = data.slice(start, end)
+        return newData.map(
+            (d, i)=> <div className='ar-tr' key={`${i}-${i+start}`}>{this.displaySingleDataRow(d, headers, sizes)}</div>  
+        )
+    }
+    displayTableBody(data, headers,subHeaders, groupLength,sizes){
+        let body =[]
+        let start = 0
+        if(groupLength.length){
+            for(let j=0; j < groupLength.length; j++){
+                console.log('here 1')
+                let groupRow = this.displayGroupRowData(data, headers, groupLength[j], start, sizes)
+                if(subHeaders[j]){
+                    groupRow = [this.displayGroupingHeader(subHeaders[j]), ...groupRow]
+                }
+                body=[...body, ...groupRow]
+                start += groupLength[j]
+            }
+        }
+        else{
+            let groupRow = this.displayGroupRowData(data, headers, data.length, 0, sizes)
+            if(subHeaders.length){
+                body=[this.displayGroupingHeader(subHeaders[0]), ...groupRow]
+            }
+            else{
+                body = groupRow
+            }
+        }
+        return body
+    }
     render(){
         const {colSizes} = sizing
         const {data, other} = this.state
         console.log('sizes', colSizes)
+        const sizes =[0,0,0]
+        //data, headers,subHeaders, groupLength,sizes
+        console.log('body',this.displayTableBody(dataObject.data, columnsObject.headers, dataObject.independentSubheaders, dataObject.groupLength, sizes))
+        const BodyJsx = this.displayTableBody(dataObject.data, columnsObject.headers, dataObject.independentSubheaders, dataObject.groupLength, sizes)
+        const mainHeader = this.displayMainHeder(columnsObject.headers, sizes)
+        const independentHeaders = this.displayIndependentHeader(columnsObject.independentHeaders[0])
         return (
             <div className='art-table'>
                 <div className='ar-table' >
-                <div className='ar-thead'>
+                {/* <div className='ar-thead'>
                             <div className='ar-tr'>
                                 {
                                     data.map(
@@ -97,15 +210,21 @@ export default class TheResizeProblem extends Component{
                                     )
                                 }
                             </div>
-                            <div className='ar-thead'>
+                            <div className='ar-tr'>
                                 <div className='ar-tr ar-th-independent'>
                                     Open
                                 </div>
                             </div>
-                    </div>
+                    </div> */}
+                    {
+                        mainHeader
+                    }
+                    {
+                        independentHeaders
+                    }
                     <div className='ar-tbody' style={{minWidth: this.state.minWidth}}>
                         <div className='ar-tbody-group'>
-                                <div className='ar-tr'>
+                                {/* <div className='ar-tr'>
                                     {
                                         other.map(
                                             (d,i)=>(
@@ -115,169 +234,9 @@ export default class TheResizeProblem extends Component{
                                             )
                                         )
                                     }
-                                </div>
-                        </div>
-                        <div className='ar-tbody-group'>
-                                <div className='ar-tr'>
-                                    {
-                                        other.map(
-                                            (d,i)=>(
-                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
-                                                    {d}
-                                                </div>
-                                            )
-                                        )
-                                    }
-                                </div>
-                        </div>
-                        <div className='ar-tbody-group'>
-                                <div className='ar-tr'>
-                                    {
-                                        other.map(
-                                            (d,i)=>(
-                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
-                                                    {d}
-                                                </div>
-                                            )
-                                        )
-                                    }
-                                </div>
-                        </div>
-                        <div className='ar-tbody-group'>
-                                <div className='ar-tr'>
-                                    {
-                                        other.map(
-                                            (d,i)=>(
-                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
-                                                    {d}
-                                                </div>
-                                            )
-                                        )
-                                    }
-                                </div>
-                        </div>
-                    </div>
-                    <div className='ar-thead'>
-                            
-                            <div className='ar-thead'>
-                                <div className='ar-tr ar-th-independent'>
-                                   Legal
-                                </div>
-                            </div>
-                    </div>
-                    <div className='ar-tbody' style={{minWidth: this.state.minWidth}}>
-                        <div className='ar-tbody-group'>
-                                <div className='ar-tr'>
-                                    {
-                                        other.map(
-                                            (d,i)=>(
-                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
-                                                    {d}
-                                                </div>
-                                            )
-                                        )
-                                    }
-                                </div>
-                        </div>
-                        <div className='ar-tbody-group'>
-                                <div className='ar-tr'>
-                                    {
-                                        other.map(
-                                            (d,i)=>(
-                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
-                                                    {d}
-                                                </div>
-                                            )
-                                        )
-                                    }
-                                </div>
-                        </div>
-                        <div className='ar-tbody-group'>
-                                <div className='ar-tr'>
-                                    {
-                                        other.map(
-                                            (d,i)=>(
-                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
-                                                    {d}
-                                                </div>
-                                            )
-                                        )
-                                    }
-                                </div>
-                        </div>
-                        <div className='ar-tbody-group'>
-                                <div className='ar-tr'>
-                                    {
-                                        other.map(
-                                            (d,i)=>(
-                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
-                                                    {d}
-                                                </div>
-                                            )
-                                        )
-                                    }
-                                </div>
-                        </div>
-                    </div>
-                    <div className='ar-thead'>
-                            <div className='ar-thead'>
-                                <div className='ar-tr ar-th-independent'>
-                                    Closed
-                                </div>
-                            </div>
-                    </div>
-                    <div className='ar-tbody' style={{minWidth: this.state.minWidth}}>
-                        <div className='ar-tbody-group'>
-                                <div className='ar-tr'>
-                                    {
-                                        other.map(
-                                            (d,i)=>(
-                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
-                                                    {d}
-                                                </div>
-                                            )
-                                        )
-                                    }
-                                </div>
-                        </div>
-                        <div className='ar-tbody-group'>
-                                <div className='ar-tr'>
-                                    {
-                                        other.map(
-                                            (d,i)=>(
-                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
-                                                    {d}
-                                                </div>
-                                            )
-                                        )
-                                    }
-                                </div>
-                        </div>
-                        <div className='ar-tbody-group'>
-                                <div className='ar-tr'>
-                                    {
-                                        other.map(
-                                            (d,i)=>(
-                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
-                                                    {d}
-                                                </div>
-                                            )
-                                        )
-                                    }
-                                </div>
-                        </div>
-                        <div className='ar-tbody-group'>
-                                <div className='ar-tr'>
-                                    {
-                                        other.map(
-                                            (d,i)=>(
-                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
-                                                    {d}
-                                                </div>
-                                            )
-                                        )
-                                    }
-                                </div>
+                                </div> */}
+                               
+                                {BodyJsx}
                         </div>
                     </div>
                 </div>

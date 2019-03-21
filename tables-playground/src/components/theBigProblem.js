@@ -9,32 +9,78 @@ let sizing={
     initialFlex: 0
 }
 const columnsObject = {
-    independentHeaders: ['Legends', 'Money Makers', 'Dedicated People'],
+    independentHeaders: ['Legends', 'Grinders', 'Kept it 100'],
     headers: [{header:'Players', field:'player'}, {header: 'Coachs', field:'coach'}, {header:'ladies', field:'lady'}]
 }
-const dataObject ={
-    independentSubheaders: ['sub header 1', 'sub header 2'],
-    data: [{player: 'Drogba', coach: 'Ferguson', lady:'Mother Theresa'},
-     {player: 'Gianfranco Zola', coach: 'Ferguson', lady:'Aung Sang Suu Kyi'},
-     {player: 'John Terry', coach: 'Guardiola', lady:'Mothers'},
-     {player: 'Ricardo Carvalho', coach: 'Morinho', lady:'Serena Williams'},
-     {player: 'Claude Makelele', coach: 'Di Mateo', lady:'Mothers'},
-     {player: 'Lampard', coach: 'Lampard', lady:'Michelle Obame'},
-     {player: 'Arjen Robben', coach: 'Boby Robson', lady:'Queen of Englans'},
-     {player: 'Diego Costa', coach: 'Franz Beckenbauer', lady:'Oprah Winfrey'},
-     {player: 'Dan Petrescu', coach: 'Sir Matt Busby', lady:'Madonna'},
-     {player: 'Eidur Gudjohnsen', coach: 'Fabio Capello', lady:'Indira Gandhi'},
-     {player: 'Eden Hazard', coach: 'Brian Clough', lady:' Audrey Hepburn '},
-     {player: 'Ashley Cole', coach: 'Johan Cruyff', lady:'Duchess of Cambridge'},
-     {player: 'NGolo Kanté', coach: 'Ernst Happel', lady:'Mute R Kelly'},
-     {player: 'Ruud Gullit', coach: 'Helenio Herrera', lady:'Queen of Saba'},
-     {player: 'Branislav Ivanović', coach: 'Guus Hiddink', lady:'Beyonce'},
-     {player: 'César Azpilicueta', coach: 'Ottmar Hitzfeld', lady:'Rihanna'},
-     {player: 'Marcel Desailly', coach: 'Marcello Lippi', lady:'Monroe'}
-    ],
-    groupLength:[7, 10]
-}
-// data structure check, display function 80% done. next: displaying the entire structure and resizing using sizing, and thinking about using data as props
+const dataObject =[
+    {
+        independentSubheaders: [],
+        data: [{player: 'Drogba', coach: 'Ferguson', lady:'Mother Theresa'},
+         {player: 'Gianfranco Zola', coach: 'Morinho', lady:'Aung Sang Suu Kyi'},
+         {player: 'John Terry', coach: 'Guardiola', lady:'Mothers'},
+         {player: 'Ricardo Carvalho', coach: 'Morinho', lady:'Serena Williams'},
+         {player: 'Claude Makelele', coach: 'Di Mateo', lady:'Ndabaga'},
+         {player: 'Lampard', coach: 'Lampard', lady:'Michelle Obame'},
+         {player: 'Arjen Robben', coach: 'Boby Robson', lady:'Queen of England'},
+         {player: 'Diego Costa', coach: 'Franz Beckenbauer', lady:'Oprah Winfrey'},
+         {player: 'Dan Petrescu', coach: 'Sir Matt Busby', lady:'Madonna'},
+         {player: 'Eidur Gudjohnsen', coach: 'Fabio Capello', lady:'Indira Gandhi'},
+         {player: 'Eden Hazard', coach: 'Brian Clough', lady:' Audrey Hepburn '},
+         {player: 'Ashley Cole', coach: 'Johan Cruyff', lady:'Duchess of Cambridge'},
+         {player: 'NGolo Kanté', coach: 'Ernst Happel', lady:'Mute R Kelly'},
+         {player: 'Ruud Gullit', coach: 'Helenio Herrera', lady:'Queen of Saba'},
+         {player: 'Branislav Ivanović', coach: 'Guus Hiddink', lady:'Beyonce'},
+         {player: 'César Azpilicueta', coach: 'Ottmar Hitzfeld', lady:'Rihanna'},
+         {player: 'Marcel Desailly', coach: 'Marcello Lippi', lady:'Monroe'}
+        ],
+        groupLength:[4, 3]
+    },
+    {
+        independentSubheaders: ['Still Active', 'Inactive'],
+        data: [{player: 'Drogba', coach: 'Ferguson', lady:'Mother Theresa'},
+         {player: 'Gianfranco Zola', coach: 'Morinho', lady:'Aung Sang Suu Kyi'},
+         {player: 'John Terry', coach: 'Guardiola', lady:'Mothers'},
+         {player: 'Ricardo Carvalho', coach: 'Morinho', lady:'Serena Williams'},
+         {player: 'Claude Makelele', coach: 'Di Mateo', lady:'Ndabaga'},
+         {player: 'Lampard', coach: 'Lampard', lady:'Michelle Obame'},
+         {player: 'Arjen Robben', coach: 'Boby Robson', lady:'Queen of England'},
+         {player: 'Diego Costa', coach: 'Franz Beckenbauer', lady:'Oprah Winfrey'},
+         {player: 'Dan Petrescu', coach: 'Sir Matt Busby', lady:'Madonna'},
+         {player: 'Eidur Gudjohnsen', coach: 'Fabio Capello', lady:'Indira Gandhi'},
+         {player: 'Eden Hazard', coach: 'Brian Clough', lady:' Audrey Hepburn '},
+         {player: 'Ashley Cole', coach: 'Johan Cruyff', lady:'Duchess of Cambridge'},
+         {player: 'NGolo Kanté', coach: 'Ernst Happel', lady:'Mute R Kelly'},
+         {player: 'Ruud Gullit', coach: 'Helenio Herrera', lady:'Queen of Saba'},
+         {player: 'Branislav Ivanović', coach: 'Guus Hiddink', lady:'Beyonce'},
+         {player: 'César Azpilicueta', coach: 'Ottmar Hitzfeld', lady:'Rihanna'},
+         {player: 'Marcel Desailly', coach: 'Marcello Lippi', lady:'Monroe'}
+        ],
+        groupLength:[5, 5]
+    },
+    {
+        independentSubheaders: [],
+        data: [{player: 'Drogba', coach: 'Ferguson', lady:'Mother Theresa'},
+         {player: 'Gianfranco Zola', coach: 'Morinho', lady:'Aung Sang Suu Kyi'},
+         {player: 'John Terry', coach: 'Guardiola', lady:'Mothers'},
+         {player: 'Ricardo Carvalho', coach: 'Morinho', lady:'Serena Williams'},
+         {player: 'Claude Makelele', coach: 'Di Mateo', lady:'Ndabaga'},
+         {player: 'Lampard', coach: 'Lampard', lady:'Michelle Obame'},
+         {player: 'Arjen Robben', coach: 'Boby Robson', lady:'Queen of England'},
+         {player: 'Diego Costa', coach: 'Franz Beckenbauer', lady:'Oprah Winfrey'},
+         {player: 'Dan Petrescu', coach: 'Sir Matt Busby', lady:'Madonna'},
+         {player: 'Eidur Gudjohnsen', coach: 'Fabio Capello', lady:'Indira Gandhi'},
+         {player: 'Eden Hazard', coach: 'Brian Clough', lady:' Audrey Hepburn '},
+         {player: 'Ashley Cole', coach: 'Johan Cruyff', lady:'Duchess of Cambridge'},
+         {player: 'NGolo Kanté', coach: 'Ernst Happel', lady:'Mute R Kelly'},
+         {player: 'Ruud Gullit', coach: 'Helenio Herrera', lady:'Queen of Saba'},
+         {player: 'Branislav Ivanović', coach: 'Guus Hiddink', lady:'Beyonce'},
+         {player: 'César Azpilicueta', coach: 'Ottmar Hitzfeld', lady:'Rihanna'},
+         {player: 'Marcel Desailly', coach: 'Marcello Lippi', lady:'Monroe'}
+        ],
+        groupLength:[7, 10]
+    }
+]
+// data structure check, display function 90% done. next: handling sorting
 export default class TheResizeProblem extends Component{
     constructor(props){
         super(props)
@@ -156,13 +202,13 @@ export default class TheResizeProblem extends Component{
             (d, i)=> <div className='ar-tr' key={`${i}-${i+start}`}>{this.displaySingleDataRow(d, headers, sizes)}</div>  
         )
     }
-    displayTableBody(data, headers,subHeaders, groupLength,sizes){
+    displayTableBodyGroup(data, headers,subHeaders, groupLength,sizes){
         let body =[]
         let start = 0
-        if(groupLength.length){
+        if(groupLength && groupLength.length){
             for(let j=0; j < groupLength.length; j++){
                 let groupRow = this.displayGroupRowData(data, headers, groupLength[j], start, sizes)
-                if(subHeaders[j]){
+                if(subHeaders && subHeaders[j]){
                     groupRow = [this.displayGroupingHeader(subHeaders[j], j), ...groupRow]
                 }
                 body=[...body, ...groupRow]
@@ -180,13 +226,31 @@ export default class TheResizeProblem extends Component{
         }
         return body
     }
+    displayTableBody(data, columns, sizes){
+        const {headers, independentHeaders} = columns
+        return data.map(
+            (d,i)=>(
+                <div className='ar-tbody-group' key={`body-gr-${i}`}>
+                    {
+                        independentHeaders && independentHeaders[i]?
+                            this.displayIndependentHeader(independentHeaders[i]):
+                            this.displayIndependentHeader(`category ${i}`)
+                    }
+                    {
+                        this.displayTableBodyGroup(d.data, headers, d.independentSubheaders, d.groupLength, sizes)
+                    }
+                </div>
+            )
+        )
+    }
     render(){
         const {colSizes} = sizing
         console.log('sizes', colSizes)
         const sizes =[0,0,0]
         //body, main header and subheader
-        const BodyJsx = this.displayTableBody(dataObject.data, columnsObject.headers, dataObject.independentSubheaders, dataObject.groupLength, colSizes)
+        const BodyJsx = this.displayTableBody(dataObject, columnsObject ,colSizes)
         const mainHeader = this.displayMainHeder(columnsObject.headers, colSizes)
+        console.log('main',mainHeader)
         const independentHeaders = this.displayIndependentHeader(columnsObject.independentHeaders[0])
         return (
             <div className='art-table'>
@@ -215,10 +279,7 @@ export default class TheResizeProblem extends Component{
                     {
                         mainHeader
                     }
-                    {
-                        independentHeaders
-                    }
-                    <div className='ar-tbody' style={{minWidth: this.state.minWidth}}>
+                    <div className='ar-tbody' >
                         <div className='ar-tbody-group'>
                                 {/* <div className='ar-tr'>
                                     {

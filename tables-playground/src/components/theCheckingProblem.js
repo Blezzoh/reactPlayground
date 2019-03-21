@@ -80,8 +80,8 @@ const dataObject =[
         groupLength:[7, 10]
     }
 ]
-// data structure check, display function 80% done. next: displaying the entire structure and resizing using sizing, and thinking about using data as props
-export default class TheResizeProblem extends Component{
+// data structure check, display function 80% done. next: working on adding a checkbox
+export default class TheCheckingProblem extends Component{
     constructor(props){
         super(props)
         this.state ={

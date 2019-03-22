@@ -80,7 +80,7 @@ let dataObject = [
         groupLength: [7, 10]
     }
 ]
-// data structure check, display function 90% done. next: checks all and a single row
+// data structure check, display function 80% done. next: displaying the entire structure and resizing using sizing, and thinking about using data as props
 export default class TheCheckingProblem extends Component {
     constructor(props) {
         super(props)
@@ -143,9 +143,13 @@ export default class TheCheckingProblem extends Component {
         // console.log('width mouse up')
     }
     handleSelectAll() {
+        const {isAllSelected} = this.state
         for (let i = 0; i < dataObject.length; i++) {
             for (let j = 0; j < dataObject[i].data.length; j++) {
-                dataObject[i].data[j] = { ...dataObject[i].data[j], selected: !dataObject[i].data[j].selected }
+                if(isAllSelected)
+                    dataObject[i].data[j] = { ...dataObject[i].data[j], selected: false }
+                else    
+                    dataObject[i].data[j] = { ...dataObject[i].data[j], selected: true }
             }
         }
         this.setState({ isAllSelected: !this.state.isAllSelected })
@@ -199,7 +203,6 @@ export default class TheCheckingProblem extends Component {
         )
     }
     handleSelect(dataIndex, arrayIndex) {
-        console.log('data index', dataIndex, arrayIndex)
         dataObject[dataIndex].data[arrayIndex] ={ ...dataObject[dataIndex].data[arrayIndex], selected: !dataObject[dataIndex].data[arrayIndex].selected}
         if(this.areAllSelected()){
             this.setState({isAllSelected: true})
@@ -237,7 +240,7 @@ export default class TheCheckingProblem extends Component {
         const end = start + length
         const newData = data.slice(start, end)
         return newData.map(
-            (d, i) => <div className='ar-tr' key={`${i}-${i + start}`}>{this.displaySingleDataRow(d, headers, sizes,dataIndex,i)}</div>
+            (d, i) => <div className='ar-tr' key={`${i}-${i + start}`}>{this.displaySingleDataRow(d, headers, sizes,dataIndex,i+start)}</div>
         )
     }
     displayTableBodyGroup(data, headers, subHeaders, groupLength, sizes, dataIndex) {

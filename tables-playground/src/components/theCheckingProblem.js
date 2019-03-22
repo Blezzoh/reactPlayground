@@ -12,7 +12,7 @@ const columnsObject = {
     independentHeaders: ['Legends', 'Grinders', 'Kept it 100'],
     headers: [{ header: 'Players', field: 'player' }, { header: 'Coachs', field: 'coach' }, { header: 'ladies', field: 'lady' }]
 }
-const dataObject = [
+let dataObject = [
     {
         independentSubheaders: [],
         data: [{ player: 'Drogba', coach: 'Ferguson', lady: 'Mother Theresa', selected: false },
@@ -80,7 +80,7 @@ const dataObject = [
         groupLength: [7, 10]
     }
 ]
-// data structure check, display function 80% done. next: displaying the entire structure and resizing using sizing, and thinking about using data as props
+// data structure check, display function 90% done. next: checks all and a single row
 export default class TheCheckingProblem extends Component {
     constructor(props) {
         super(props)
@@ -88,13 +88,7 @@ export default class TheCheckingProblem extends Component {
             minWidth: '1000px',
             data: ['brdk', 'mane', 'zizou', 'beckham'],
             other: ['legend', 'African beast', 'power shot'],
-            sizing: {
-                colSizes: [],
-                minSize: 0.1,
-                currentlySizing: false,
-                startX: 0,
-                parentWidth: 0
-            }
+            isAllSelected: false
         }
     }
 
@@ -115,26 +109,26 @@ export default class TheCheckingProblem extends Component {
         e.stopPropagation()
         const parentWidth = e.target.parentElement.getBoundingClientRect().width
         let pageX = e.pageX
-        console.log('width', parentWidth, pageX, 'currently sizing', i)
+        // console.log('width', parentWidth, pageX, 'currently sizing', i)
         document.addEventListener('mousemove', this.handleResizeMovement)
         document.addEventListener('mouseup', this.handleResizeStop)
         document.addEventListener('mouseleave', this.handleResizeStop)
         sizing = { ...sizing, startX: pageX, parentWidth: parentWidth, resizing: true, currentlySizing: i }
     }
     handleResizeMovement = (e) => {
-        console.log('being called')
+        // console.log('being called')
         e.stopPropagation()
         const { startX, parentWidth } = sizing
         let sizes = sizing.colSizes
         let pageX = e.pageX
         const newWidth = (parentWidth + pageX - startX)
         sizes[sizing.currentlySizing] = newWidth
-        console.log('width new', pageX, startX, parentWidth, newWidth, sizing)
+        // console.log('width new', pageX, startX, parentWidth, newWidth, sizing)
         sizing = { ...sizing, flexNumber: newWidth, colSizes: sizes }
         this.forceUpdate()// as sizing is neither a prop or a state value, it is not going to trigger the rendering ... thus forcing the update
     }
     handleResizeStop = (e) => {
-        console.log('being called stop')
+        // console.log('being called stop')
         e.stopPropagation()
         document.removeEventListener('mousemove', this.handleResizeMovement)
         document.removeEventListener('mouseup', this.handleResizeStop)
@@ -146,7 +140,15 @@ export default class TheCheckingProblem extends Component {
             // parentWidth: 0,
             // startX:0,
         }
-        console.log('width mouse up')
+        // console.log('width mouse up')
+    }
+    handleSelectAll() {
+        for (let i = 0; i < dataObject.length; i++) {
+            for (let j = 0; j < dataObject[i].data.length; j++) {
+                dataObject[i].data[j] = { ...dataObject[i].data[j], selected: !dataObject[i].data[j].selected }
+            }
+        }
+        this.setState({ isAllSelected: !this.state.isAllSelected })
     }
     displayMainHeder(headers, sizes) {
         const newHeaders = [0, ...headers]
@@ -166,9 +168,9 @@ export default class TheCheckingProblem extends Component {
                                 )
                                 :
                                 (
-                                    <div className='ar-resizable-header pointed ar-th ar-th-check' style={{flex:`30px 0`}} key={i}>
+                                    <div className='ar-resizable-header pointed ar-th ar-th-check' style={{ flex: `30px 0` }} key={i} onClick={() => this.handleSelectAll()}>
                                         <div className='ar-th-data ar-th-data-check'>
-                                            <input type='checkbox' />
+                                            <input type='checkbox' checked={this.state.isAllSelected} readOnly />
                                         </div>
                                     </div>
                                 )
@@ -196,36 +198,54 @@ export default class TheCheckingProblem extends Component {
             </div>
         )
     }
-    displaySingleDataRow(row, headers, sizes) {
+    handleSelect(dataIndex, arrayIndex) {
+        console.log('data index', dataIndex, arrayIndex)
+        dataObject[dataIndex].data[arrayIndex] ={ ...dataObject[dataIndex].data[arrayIndex], selected: !dataObject[dataIndex].data[arrayIndex].selected}
+        if(this.areAllSelected()){
+            this.setState({isAllSelected: true})
+        }
+        else{
+            this.setState({isAllSelected: false})
+        }
+    }
+    areAllSelected(){
+        for (let i = 0; i < dataObject.length; i++) {
+            for (let j = 0; j < dataObject[i].data.length; j++) {
+                if(!dataObject[i].data[j].selected) return false
+            }
+        }
+        return true
+    }
+    displaySingleDataRow(row, headers, sizes, dataIndex, arrayIndex ) {
         const newHeaders = [0, ...headers]
         return newHeaders.map(
             (d, i) => {
-                return i !== 0?(
+                return i !== 0 ? (
                     <div className='ar-td' key={i} style={sizes[i] ? { flex: `${sizes[i]}px 0` } : { flex: `1 0` }}>
                         {row[d.field]}
                     </div>
-                ):
-                (
-                    <div className='ar-td' key={i} style={{ flex: `30px 0` }}>
-                        <input type='checkbox' />
-                    </div>
-                )
+                ) :
+                    (
+                        <div className='ar-td' key={i} style={{ flex: `30px 0` }} onClick={() => this.handleSelect(dataIndex, arrayIndex)}>
+                            <input type='checkbox' checked={row.selected} readOnly />
+                        </div>
+                    )
             }
         )
     }
-    displayGroupRowData(data, headers, length, start, sizes) {
+    displayGroupRowData(data, headers, length, start, sizes, dataIndex) {
         const end = start + length
         const newData = data.slice(start, end)
         return newData.map(
-            (d, i) => <div className='ar-tr' key={`${i}-${i + start}`}>{this.displaySingleDataRow(d, headers, sizes)}</div>
+            (d, i) => <div className='ar-tr' key={`${i}-${i + start}`}>{this.displaySingleDataRow(d, headers, sizes,dataIndex,i)}</div>
         )
     }
-    displayTableBodyGroup(data, headers, subHeaders, groupLength, sizes) {
+    displayTableBodyGroup(data, headers, subHeaders, groupLength, sizes, dataIndex) {
         let body = []
         let start = 0
         if (groupLength && groupLength.length) {
             for (let j = 0; j < groupLength.length; j++) {
-                let groupRow = this.displayGroupRowData(data, headers, groupLength[j], start, sizes)
+                let groupRow = this.displayGroupRowData(data, headers, groupLength[j], start, sizes, dataIndex)
                 if (subHeaders && subHeaders[j]) {
                     groupRow = [this.displayGroupingHeader(subHeaders[j], j), ...groupRow]
                 }
@@ -255,7 +275,7 @@ export default class TheCheckingProblem extends Component {
                             this.displayIndependentHeader(`category ${i}`)
                     }
                     {
-                        this.displayTableBodyGroup(d.data, headers, d.independentSubheaders, d.groupLength, sizes)
+                        this.displayTableBodyGroup(d.data, headers, d.independentSubheaders, d.groupLength, sizes, i)
                     }
                 </div>
             )
@@ -263,56 +283,22 @@ export default class TheCheckingProblem extends Component {
     }
     render() {
         const { colSizes } = sizing
-        console.log('sizes', colSizes)
-        const sizes = [0, 0, 0]
+        // console.log('sizes', colSizes)
         //body, main header and subheader
         const BodyJsx = this.displayTableBody(dataObject, columnsObject, colSizes)
         const mainHeader = this.displayMainHeder(columnsObject.headers, colSizes)
-        console.log('main', mainHeader)
-        const independentHeaders = this.displayIndependentHeader(columnsObject.independentHeaders[0])
         return (
             <div className='art-table'>
                 <div className='ar-table' >
-                    {/* <div className='ar-thead'>
-                            <div className='ar-tr'>
-                                {
-                                    data.map(
-                                        (d, i)=> (
-                                            <div className='ar-resizable-header pointed ar-th' style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}} key={i}>
-                                                <div className='ar-th-data'>{d}</div>
-                                                <div className='ar-resizer' 
-                                                    onMouseDown={e=>this.handleResizeStart(e, i)}
-                                                />
-                                            </div>
-                                        )
-                                    )
-                                }
-                            </div>
-                            <div className='ar-tr'>
-                                <div className='ar-tr ar-th-independent'>
-                                    Open
-                                </div>
-                            </div>
-                    </div> */}
-                    {
-                        mainHeader
-                    }
+                    <div className='ar-thead'>
+                        {
+                            mainHeader
+                        }
+                    </div>
                     <div className='ar-tbody' >
-                        <div className='ar-tbody-group'>
-                            {/* <div className='ar-tr'>
-                                    {
-                                        other.map(
-                                            (d,i)=>(
-                                                <div className='ar-td' key={i} style={colSizes[i]?{flex: `${colSizes[i]}px 0`}: {flex:`1 0`}}>
-                                                    {d}
-                                                </div>
-                                            )
-                                        )
-                                    }
-                                </div> */}
-
-                            {BodyJsx}
-                        </div>
+                        {
+                            BodyJsx
+                        }
                     </div>
                 </div>
             </div>

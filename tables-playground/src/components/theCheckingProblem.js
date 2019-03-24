@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import './artable.css'
+import './resizable.css'
+import {sortFn} from './util'
 let sizing = {
     colSizes: [],
     minSize: 0.1,
@@ -14,7 +15,7 @@ const columnsObject = {
 }
 let dataObject = [
     {
-        independentSubheaders: [],
+        independentSubheaders: ['goats', 'amazing people'],
         data: [{ player: 'Drogba', coach: 'Ferguson', lady: 'Mother Theresa', selected: false },
         { player: 'Gianfranco Zola', coach: 'Morinho', lady: 'Aung Sang Suu Kyi', selected: false },
         { player: 'John Terry', coach: 'Guardiola', lady: 'Mothers', selected: false },
@@ -33,7 +34,7 @@ let dataObject = [
         { player: 'César Azpilicueta', coach: 'Ottmar Hitzfeld', lady: 'Rihanna', selected: false },
         { player: 'Marcel Desailly', coach: 'Marcello Lippi', lady: 'Monroe', selected: false }
         ],
-        groupLength: [4, 3]
+        groupLength: [7, 10]
     },
     {
         independentSubheaders: ['Still Active', 'Inactive'],
@@ -55,7 +56,7 @@ let dataObject = [
         { player: 'César Azpilicueta', coach: 'Ottmar Hitzfeld', lady: 'Rihanna', selected: false },
         { player: 'Marcel Desailly', coach: 'Marcello Lippi', lady: 'Monroe', selected: false }
         ],
-        groupLength: [5, 5]
+        groupLength: [10,7]
     },
     {
         independentSubheaders: [],
@@ -80,6 +81,7 @@ let dataObject = [
         groupLength: [7, 10]
     }
 ]
+
 // data structure check, display function 80% done. next: displaying the entire structure and resizing using sizing, and thinking about using data as props
 export default class TheCheckingProblem extends Component {
     constructor(props) {
@@ -88,7 +90,8 @@ export default class TheCheckingProblem extends Component {
             minWidth: '1000px',
             data: ['brdk', 'mane', 'zizou', 'beckham'],
             other: ['legend', 'African beast', 'power shot'],
-            isAllSelected: false
+            isAllSelected: false,
+            sortedBy: {field: 'player', descOrAsc: -1}
         }
     }
 
@@ -154,16 +157,33 @@ export default class TheCheckingProblem extends Component {
         }
         this.setState({ isAllSelected: !this.state.isAllSelected })
     }
+    handleSort(header){
+        const field = header.field
+        const typeOf = typeof(dataObject[0].data[0][field])
+        const {sortedBy} = this.state
+        let descOrAsc = 'asc'
+        if(sortedBy.field === field){
+            descOrAsc = sortedBy.descOrAsc === 'asc'? 'desc' : 'asc'
+        }
+        dataObject = sortFn(dataObject, typeOf, field, descOrAsc)
+        this.setState({sortedBy:{field, descOrAsc}})
+    }
     displayMainHeder(headers, sizes) {
         const newHeaders = [0, ...headers]
+        const {sortedBy} = this.state
         return (
             <div className='ar-tr'>
                 {
                     newHeaders.map(
                         (d, i) => {
+                            let classes = 'ar-resizable-header pointed ar-th'
+                            if(sortedBy.field === d.field && sortedBy.descOrAsc !== -1){
+                                const descOrAsc = sortedBy.descOrAsc === 'asc'? 'desc' : 'asc'
+                                classes = `${classes} ${descOrAsc}`
+                            }
                             return i !== 0 ?
                                 (
-                                    <div className='ar-resizable-header pointed ar-th' style={sizes[i] ? { flex: `${sizes[i]}px 0` } : { flex: `1 0` }} key={i}>
+                                    <div className={classes} style={sizes[i] ? { flex: `${sizes[i]}px 0` } : { flex: `1 0` }} key={i} onClick={()=>this.handleSort(d)}>
                                         <div className='ar-th-data'>{d.header}</div>
                                         <div className='ar-resizer'
                                             onMouseDown={e => this.handleResizeStart(e, i)}
@@ -219,12 +239,13 @@ export default class TheCheckingProblem extends Component {
         }
         return true
     }
+    
     displaySingleDataRow(row, headers, sizes, dataIndex, arrayIndex ) {
         const newHeaders = [0, ...headers]
         return newHeaders.map(
             (d, i) => {
                 return i !== 0 ? (
-                    <div className='ar-td' key={i} style={sizes[i] ? { flex: `${sizes[i]}px 0` } : { flex: `1 0` }}>
+                    <div className='ar-td' key={i} style={sizes[i] ? { flex: `${sizes[i]}px 0` } : { flex: `1 0` }} >
                         {row[d.field]}
                     </div>
                 ) :

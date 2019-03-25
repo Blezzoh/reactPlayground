@@ -82,7 +82,7 @@ let dataObject = [
     }
 ]
 
-// data structure check, display function 80% done. next: displaying the entire structure and resizing using sizing, and thinking about using data as props
+// data structure check, display function 100% done. next: passing data as props
 export default class TheCheckingProblem extends Component {
     constructor(props) {
         super(props)
@@ -91,7 +91,8 @@ export default class TheCheckingProblem extends Component {
             data: ['brdk', 'mane', 'zizou', 'beckham'],
             other: ['legend', 'African beast', 'power shot'],
             isAllSelected: false,
-            sortedBy: {field: 'player', descOrAsc: -1}
+            sortedBy: {field: 'player', descOrAsc: -1},
+            minimized: []
         }
     }
 
@@ -213,11 +214,43 @@ export default class TheCheckingProblem extends Component {
             </div>
         )
     }
-    displayGroupingHeader(str, number) {
+    handleMinimize(dataIndex, headerIndex){
+        let {minimized} = this.state 
+        const index = this.searchMinized(dataIndex, headerIndex)
+        if(index>=0){
+            minimized[index] = {...minimized[index], hidden: !minimized[index].hidden,}
+        }
+        else{
+            minimized =[...minimized, {dataIndex, headerIndex, hidden:true}]
+        }
+        this.setState({minimized})
+    }
+    searchMinized(dataIndex, headerIndex){
+        const {minimized} = this.state
+        for (let i=0; i< minimized.length; i++) {
+            if (minimized[i].dataIndex === dataIndex && minimized[i].headerIndex === headerIndex){
+                return i
+            }
+        }
+        return -1
+    }
+    displayGroupingHeader(str, dataIndex, headerIndex) {
+        const {minimized} = this.state
+        const index = this.searchMinized(dataIndex, headerIndex)
+        let icon = '-'
+        if(index >= 0){
+            if(minimized[index].hidden){
+                icon = '+'
+            }
+            else{
+               icon= '-'
+            }
+        }
         return (
-            <div className='ar-tr' key={`${str}-${number}`}>
+            <div className='ar-tr' key={`${str}-${headerIndex}`}>
                 <div className='ar-tr ar-th-independent ar-th-group'>
-                    {str}
+                    {str} 
+                    <span className='ar-minimize' onClick={()=>this.handleMinimize(dataIndex, headerIndex)}>{icon}</span>
                 </div>
             </div>
         )
@@ -257,11 +290,22 @@ export default class TheCheckingProblem extends Component {
             }
         )
     }
-    displayGroupRowData(data, headers, length, start, sizes, dataIndex) {
+    displayGroupRowData(data, headers, length, start, sizes, dataIndex, headerIndex) {
         const end = start + length
         const newData = data.slice(start, end)
+        const {minimized} = this.state
+        const index = this.searchMinized(dataIndex, headerIndex)
+        let style = {}
+        if(index >= 0){
+            if(minimized[index].hidden){
+                style={display: 'none'}
+            }
+            else{
+                style = {}
+            }
+        }
         return newData.map(
-            (d, i) => <div className='ar-tr' key={`${i}-${i + start}`}>{this.displaySingleDataRow(d, headers, sizes,dataIndex,i+start)}</div>
+            (d, i) => <div className='ar-tr' key={`${i}-${i + start}`} style={style}>{this.displaySingleDataRow(d, headers, sizes,dataIndex,i+start)}</div>
         )
     }
     displayTableBodyGroup(data, headers, subHeaders, groupLength, sizes, dataIndex) {
@@ -269,9 +313,9 @@ export default class TheCheckingProblem extends Component {
         let start = 0
         if (groupLength && groupLength.length) {
             for (let j = 0; j < groupLength.length; j++) {
-                let groupRow = this.displayGroupRowData(data, headers, groupLength[j], start, sizes, dataIndex)
+                let groupRow = this.displayGroupRowData(data, headers, groupLength[j], start, sizes, dataIndex, j)
                 if (subHeaders && subHeaders[j]) {
-                    groupRow = [this.displayGroupingHeader(subHeaders[j], j), ...groupRow]
+                    groupRow = [this.displayGroupingHeader(subHeaders[j], dataIndex, j), ...groupRow]
                 }
                 body = [...body, ...groupRow]
                 start += groupLength[j]

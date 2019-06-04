@@ -20,7 +20,7 @@ class DropDownWithSelectBoxes extends Component {
         this.setState({ value: e.target.value })
     }
     render() {
-        const { data, selected, onBoxCheck, onRemove, inputLabel } = this.props
+        const { data, selected, onBoxCheck, onRemove, inputLabel,dataName, selectAll } = this.props
         const { value } = this.state
         console.log(data)
         return (
@@ -28,13 +28,16 @@ class DropDownWithSelectBoxes extends Component {
                 <Col lg={3}>
                     <div onMouseLeave={() => this.onBlur()} onMouseEnter={() => this.onFocus()}>
                         <div className='mb-0'>
-                            <Row className=''>
+                            <div className='mb-2'>
                                 {
-                                    Array.isArray(selected) ? selected.map(
-                                        (d, i) => <Col key={`sel-dp-${i}`}><span className='mr-5'>{d}</span><Icon icon={close} size={14} onClick={() => onRemove(d)} /></Col>
-                                    ) : null
+                                    Array.isArray(selected) && Array.isArray(data) ? 
+                                    // selected.map(
+                                    //     (d, i) => <Col key={`sel-dp-${i}`}><span className='mr-5'>{d}</span><Icon icon={close} size={14} onClick={() => onRemove(d)} /></Col>
+                                    // ) 
+                                    <div>{selected.length} of {data.length} {dataName}s</div>
+                                    : null
                                 }
-                            </Row>
+                            </div>
                             <div>
                                 <Form.Group className='float-label-control'>
                                     <Form.Control onFocus={() => this.onFocus()} onChange={(e) => this.handleChange(e)} valuue={value} />
@@ -44,6 +47,9 @@ class DropDownWithSelectBoxes extends Component {
                             {/* <Icon  */}
                         </div>
                         <div hidden={this.state.hidden}>
+                            <Form.Check label='select All' checked={Array.isArray(data) && Array.isArray(selected) ?data.length === selected.length:false} 
+                                onChange={()=>selectAll()}
+                            />
                             {
                                 Array.isArray(data) && Array.isArray(selected) ? data.map(
                                     (d, i) => {
